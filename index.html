@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<!-- Bootstrap template from https://blackrockdigital.github.io/startbootstrap-freelancer/ -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>CKY Parser</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="css/freelancer.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	
+	<script type="text/javascript">
+    function array_index_of(a, e) {
+
+      if (a != null) {
+        for (var i = 0; i < a.length; ++i) {
+          if (a[i] == e)
+            return i;
+        }
+      }
+      return -1;
+    }
+    function merge_arrays(a, b) {
+      for (var i = 0; i < b.length; ++i) {
+        if (array_index_of(a, b[i]) == -1) {
+          a.push(b[i]);
+        }
+      }
+    }
+
+    function Grammar(grammar) {
+      this._terminal_rules = new Array();
+      this._non_terminal_rules = new Array();
+      var re_rule = /^(\w+)\s*->\s*(\w+)(?:\s+(\w+))?\s*\.?$/;
+      grammar = grammar.split(/\r?\n/);
+      for (var i = 0; i < grammar.length; ++i) {
+        var r = grammar[i];
+        if (r.length == 0)
+          continue;
+        var a = re_rule.exec(r);
+        if (a == null)
+          throw "bad rule syntax: " + r;
+        if (a[3]) {
+          var new_rule = new Array(a[1], a[2], a[3]);
+          this._non_terminal_rules.push(new_rule);
+          if (this._s == null)
+            this._s = new String(a[1]);
+        }
+        else
+        {
+          var new_rule = new Array(a[1], a[2]);
+          this._terminal_rules.push(new_rule);
+        }
+      }
+      this.start_symbol = function() { return this._s; }
+
+      this.left_hand_sides = function(s) {
+        var res = new Array();
+        for (var i = 0; i < this._terminal_rules.length; ++i) {
+          var r = this._terminal_rules[i];
+          if (r[1] == s)
+            res.push(r[0]);
+        }
+        return res;
+      }
+      this.left_hand_sides2 = function(s, t) {
+        var res = new Array();
+        for (var i = 0; i < this._non_terminal_rules.length; ++i) {
+          var r = this._non_terminal_rules[i];
+          if (r[1] == s && r[2] == t)
+            res.push(r[0]);
+        }
+        return res;
+      }
+      return this;
+    }
+
+    function tokenize_sentence(sentence) {
+      var s = sentence.split(/\s+/);
+      return s;
+    }
+    function allocate_chart(N) {
+      var c = new Array(N + 1);
+      c[0] = new Array(N);
+      for (var i = 1; i <= N; ++i) {
+        c[i] = new Array(N - (i - 1));
+      }
+      return c;
+    }
+    function cky_offline(grammar, sentence, eh) {
+      var G = new Grammar(grammar);
+      var S = tokenize_sentence(sentence);
+      var N = S.length;
+      var C = allocate_chart(N);
+      eh.start(S);
+      for (var j = 0; j < N; ++j) {
+        eh.active_cell_changed(0, j);
+        C[0][j] = G.left_hand_sides(S[j]);		
+        eh.cell_updated(0, j, C[0][j]);		
+      }
+      for (var i = 1; i < N; ++i) {
+        for (var j = 0; j < N - i; ++j) {
+          var nt = C[i][j];
+          eh.active_cell_changed(i, j);          
+          for (var k = i - 1; k >= 0; --k) {
+            var nts1 = C[k][j];
+            var nts2 = C[i - k - 1][j + k + 1];
+            eh.attempt_match(k, j, i - k - 1, j + k + 1);
+            if (nts1 != null && nts2 != null) {
+              for (var ii = 0; ii < nts1.length; ++ii) {
+                var nt1 = nts1[ii];
+                for (var jj = 0; jj < nts2.length; ++jj) {
+                  var nt2 = nts2[jj];
+                  var rhss = G.left_hand_sides2(nt1, nt2);
+                  if (rhss == 0 || rhss.length == 0)
+                    continue;
+                  if (nt == null) {
+                    nt = new Array();
+                    C[i][j] = nt;
+                  }
+                  foundString = 1;
+                  merge_arrays(nt, rhss);
+                  eh.found_match(k, j, i - k - 1, j + k + 1);
+                  eh.cell_updated(i, j, nt);
+                }
+              }
+            } 
+          }
+        }
+      }
+      var accepted = array_index_of(C[N - 1][0], G.start_symbol()) != -1;
+      eh.end(accepted);
+      return accepted;
+    }
+    </script>
+    <script>
+    //var COLOR_NORMAL_CELL   = "#FFFFCC";
+	var COLOR_NORMAL_CELL   = "#A9A9F5";
+    var COLOR_ACTIVE_CELL   = "red";
+    var COLOR_TEST_CELL     = "gray";
+    var COLOR_MATCH_CELL    = "blue";
+    var COLOR_UPDATE_CELL   = "pink";
+    var UPDATE_INTERVAL = 1;
+    var _update_actions = new Array();
+    var _update_action_idx = 0;
+    var _active_cell = [-1,-1];
+    var _context_cells = [-1,-1,-1,-1];
+    var _update_timer_id = -1;
+    var _is_animation_running = false;
+    function paint_cell(i, j, color) {
+      var cell = entry2cell(i, j);
+      cell.bgColor = color;
+	  cell.padding = "10px";
+    }
+    function dump_object(o) {
+      var s = "";
+      for (var p in o) { s += p + ":" + o[p] + ";  "; }
+      alert('Error :'+s);
+    }
+    function update_ui(idx) {
+ var action = _update_actions[idx];
+      eval(action);
+    }
+    function set_entry_content(i, j, content) {
+      var cell = entry2cell(i, j);
+      cell.innerHTML = content;
+    }
+    function entry2cell(i, j) {
+      return tchart.rows.item(tchart.rows.length - 1 - i).cells.item(j);
+    }
+	function gotoInput() {
+		window.history().back();
+	}
+    function do_parse() {
+		var cky_event_handler = new Object();
+      cky_event_handler.start = function(s) {
+       // clear_chart();
+		create_chart(s);
+        set_sentence(s);
+        cky_input.style.display = "none";
+		cky_input_table.style.display = "none";
+        cky_output.style.display = "block";
+        //delete_chart();
+		cky_output.focus();
+      }
+      cky_event_handler.end = function(accepted) {
+		
+		var s = "paint_cell("+_context_cells[0]+","+_context_cells[1]+",COLOR_NORMAL_CELL);";
+        s += "paint_cell("+_context_cells[2]+","+_context_cells[3]+",COLOR_NORMAL_CELL);";
+        s += "paint_cell("+_active_cell[0]+","+_active_cell[1]+",COLOR_NORMAL_CELL);";
+        _update_actions.push(s);
+        _update_action_idx = 0;
+        while( _update_action_idx < _update_actions.length){
+			update_ui(_update_action_idx);
+			_update_action_idx++;
+		}
+      }
+      cky_event_handler.cell_updated = function(i, j, content) {
+        _update_actions.push("paint_cell("+i+","+j+",COLOR_ACTIVE_CELL);" + 
+          "set_entry_content("+i+","+j+",\""+content +"\");");
+      }
+      cky_event_handler.active_cell_changed = function(i, j) {
+        var s = "";
+        if (_context_cells[0] != -1) {
+          s += "paint_cell("+_context_cells[0]+","+_context_cells[1]+",COLOR_NORMAL_CELL);";
+          s += "paint_cell("+_context_cells[2]+","+_context_cells[3]+",COLOR_NORMAL_CELL);";
+        }
+
+        if (_active_cell[0] != -1) {
+          s += "paint_cell("+_active_cell[0]+","+_active_cell[1]+",COLOR_NORMAL_CELL);";
+        }
+        s += "paint_cell("+i+","+j+",COLOR_ACTIVE_CELL);";
+        _active_cell[0] = i;
+        _active_cell[1] = j;
+        _update_actions.push(s);
+      }
+      cky_event_handler.attempt_match = function(i, j, k, l) {
+        var s = "";
+        if (_context_cells[0] != -1) {
+          s += "paint_cell("+_context_cells[0]+","+_context_cells[1]+",COLOR_NORMAL_CELL);";
+          s += "paint_cell("+_context_cells[2]+","+_context_cells[3]+",COLOR_NORMAL_CELL);";
+        }
+        s += "paint_cell("+i+","+j+",COLOR_TEST_CELL);";
+        s += "paint_cell("+k+","+l+",COLOR_TEST_CELL);";
+        _update_actions.push(s);
+        _context_cells[0] = i;
+        _context_cells[1] = j;
+        _context_cells[2] = k;
+        _context_cells[3] = l;
+      }
+      cky_event_handler.found_match = function(i, j, k, l) {
+        var s = "";
+        s += "paint_cell("+i+","+j+",COLOR_MATCH_CELL);";
+        s += "paint_cell("+k+","+l+",COLOR_MATCH_CELL);";
+        s += "paint_cell("+_active_cell[0]+","+_active_cell[1]+",COLOR_MATCH_CELL);";
+        _update_actions.push(s);       
+      }
+      try {
+		var result = cky_offline(idgram.value, idsen.value, cky_event_handler)
+		if( result == true) {
+			alert('The Sentence is Derivable by the Current Grammar');
+		} else {
+			alert('The Sentence is not Derivable by the Current Grammar' );
+		}
+      }
+      catch (e) {
+        alert('Error :'+e);
+        //alert('Please Enter the Text');
+		return;
+      }
+    }
+    function create_chart(s) {
+      var n = s.length;
+      var tb = tchart.firstChild;
+      if (tb == null || typeof(tb) == 'undefined') {
+        tb = document.createElement("TBODY");
+        tchart.appendChild(tb);
+      }  
+	  
+      for (var i = 0; i < n; ++i) {
+		//for (var i = n; i > 0; --i) {
+	 var row = document.createElement("TR");
+        tb.appendChild(row);
+        //for (var j = 0; j <= i; j++) {
+		for (var j = i; j >= 0; j--) {
+          var cell = document.createElement("TD");      
+          row.appendChild(cell);
+          //cell.setAttribute("width", (1 / n) * 50.00 + "%");
+          //row.setAttribute("width", (1/n) * 100.00 + "%");
+		  cell.setAttribute("width", (1/n) * 50.00 + "%");
+		  cell.setAttribute("align", "center");
+          cell.setAttribute("bgColor", COLOR_NORMAL_CELL);
+		  //cell.setAttribute("bgColor", "#A9A9F0");
+         cell.innerHTML = "&nbsp;";
+        }
+      }
+    }
+    
+	function set_sentence(s) {
+      var n = s.length;      
+      var tb = tsentence.firstChild;
+      if (tb == null || typeof(tb) == 'undefined') {
+        tb = document.createElement("TBODY");
+        tsentence.appendChild(tb);
+      }
+      var row = document.createElement("TR");
+      tb.appendChild(row);
+     for (var i = 0; i < n; ++i) {
+	//for (var i = n; i > 0; i--) {
+        var cell = document.createElement("TD");
+        row.appendChild(cell);
+        cell.setAttribute("width", (1/ n) * 50.00 + "%");
+        cell.setAttribute("align", "center");
+		cell.setAttribute("bgColor", "#D8E8D8");
+        cell.innerHTML = s[i];
+      }
+    }
+    function delete_chart() {
+      cky_input.style.display = "block";
+	  cky_input_table.style.display = "block";
+      cky_output.style.display = "none";
+      clearInterval(_update_timer_id);
+      _update_actions = new Array();
+      tchart.removeChild(tchart.firstChild);
+      tsentence.removeChild(tsentence.firstChild);
+    }
+    function clear_chart() {
+      var cells = tchart.getElementsByTagName("TD");
+      for (var i = 0; i < cells.length; ++i) {
+        cells[i].innerHTML = "&nbsp;";
+      }
+    }
+    </script>
+	<style>
+	
+	.parsetable
+	{
+		margin:0px auto;
+	}
+	
+	.parsetable, .parsetable tr, .parsetable td
+	{
+		background-color: #eee;
+	}
+	
+	.parsetable td
+	{
+		padding: 10px;
+	}
+	#tchart td
+	{
+		border: solid 1px black;
+		padding: 10px;
+	}
+	
+	
+	</style>
+
+</head>
+
+<body id="page-top" class="index">
+<div id="skipnav"><a href="#maincontent">Skip to main content</a></div>
+
+    <!-- Navigation -->
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top navbar-custom">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="#page-top">CSCI 549 - Automata Theory</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#portfolio">Parser</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#about">Sentences</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <!-- Header -->
+    <header>
+        <div class="container" id="maincontent" tabindex="-1">
+            <div class="row">
+                <div class="col-lg-12">
+                    <img class="img-responsive" src="img/profile.png" alt="">
+                    <div class="intro-text">
+                        <h1 class="name">Final Project</h1><h2>CSCI 549 - Automata Theory</h2>
+                        <hr class="star-light">
+                        <h4><span class="skills">Abhijeet Chopra</span></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Portfolio Grid Section -->
+    <section id="portfolio">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Parser</h2>
+                    <hr class="star-primary">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 text-center">
+						<div id="cky_output" style="display:none; width:10%; margin:0 auto;" tabindex="1">
+							<input class="btn btn-success btn-lg" onclick="location.reload();" type="button" value="RESET">
+							<br>
+							<br>
+							<br>
+							<br>
+							<table class="" border="0" id="tchart" width=""></table>
+							<table class="" id="tsentence" width=""></table>
+							<br/>
+						</div>
+						<table id="cky_input_table" class="table-bordered table-responsive parsetable" width="100%">
+							<tr>
+								<td>
+									<div id="cky_input" style="display:block">
+										<center>
+											<h3>CNF Grammar</h3>
+<textarea cols="40" id="idgram" rows="20" style="background:white">
+S -> NP VP
+
+S -> Verb NP
+
+S -> X2 PP
+
+S -> Verb PP
+
+S -> VP PP
+
+S -> was
+
+S -> gave
+
+S -> gives
+
+S -> told
+
+S -> slowly
+
+S -> found
+
+S -> thought
+
+S -> ordered
+
+NP -> There
+
+NP -> It
+
+NP -> big
+
+NP -> cheap
+
+NP -> goods
+
+NP -> He
+
+NP -> the
+
+NP -> her
+
+NP -> timely
+
+NP -> expensive
+
+NP -> children
+
+NP -> FedEx
+
+NP -> heavy
+
+NP -> Det Nominal
+
+Nominal -> Nominal Noun
+
+Nominal -> Nominal PP
+
+Nominal -> beautiful
+
+Nominal -> feasible
+
+Nominal -> parcel
+
+Nominal -> weight
+
+Nominal -> far
+
+Nominal -> location
+
+Nominal -> little
+
+Nominal -> belonged
+
+Nominal -> envelope
+
+Nominal -> important
+
+Nominal -> warehouse
+
+VP -> was
+
+VP -> gave
+
+VP -> gives
+
+VP -> told
+
+VP -> slowly
+
+VP -> found
+
+VP -> thought
+
+VP -> ordered
+
+VP -> Verb NP
+
+VP -> X2 PP
+
+X2 -> Verb NP
+
+VP -> Verb PP
+
+VP -> VP PP
+
+PP -> Preposition NP
+
+Verb -> was
+
+Verb -> gave
+
+Verb -> gives
+
+Verb -> told
+
+Verb -> slowly
+
+Verb -> found
+
+Verb -> thought
+
+Verb -> ordered
+
+Det -> a
+
+Det -> The
+
+Det -> the
+
+Det -> her
+
+Det -> send
+
+Det -> reached
+
+Det -> seven
+
+Det -> they
+
+Noun -> document
+
+Noun -> discount
+
+Noun -> away
+
+Noun -> beds
+
+Noun -> beautiful
+
+Noun -> feasible
+
+Noun -> parcel
+
+Noun -> weight
+
+Noun -> far
+
+Noun -> location
+
+Noun -> little
+
+Noun -> belonged
+
+Noun -> envelope
+
+Noun -> important
+
+Noun -> warehouse
+
+Preposition -> named
+
+Preposition -> and
+
+Preposition -> in
+
+Preposition -> into
+
+Preposition -> to
+
+Preposition -> send
+</textarea>
+										</center>
+									</div>
+								</td>
+								<td>
+									<center>
+										<h3>Enter the String</h3>
+										<br>
+										<br>
+										<input id="idsen" size="50" type="text" value="">
+										<br>
+										
+										<p>
+											<br/>
+											<input onclick="do_parse();" style="width:150px;height:50px" type="image" class="btn btn-success btn-lg">		
+										</p>
+									</center>
+								</td>
+							</tr>
+						</table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="success" id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Sentences</h2>
+                    <hr class="star-light">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 text-center">
+                    
+<h3>Derivable Sentences</h3>
+
+<ol>
+<li>It was big and cheap</li>
+<li>FedEx gave a feasible discount</li>
+<li>The parcel was heavy in the weight</li>
+<li>He told her to send far away</li>
+<li>FedEx gives goods into the warehouse</li>
+<li>It was timely and expensive</li>
+<li>It slowly reached location</li>
+</ol>
+
+<h3>Non derivable Sentences</h3>
+<ol>
+<li>She ordered her envelope to send the important document</li>
+<li>But the envelope could not cover FedEx</li>
+<li>But soon she found shipment in front of a table</li>
+</ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center">
+        <div class="footer-above">
+            <div class="container">
+                <div class="row">
+                    <div class="footer-col col-md-12">
+                        <h3>Abhijeet Chopra</h3>
+                        <p>CWID: 50180612</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-below">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        Texas A&M University - Commerce
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
+    <div class="scroll-top page-scroll hidden-sm hidden-xs hidden-lg hidden-md">
+        <a class="btn btn-primary" href="#page-top">
+            <i class="fa fa-chevron-up"></i>
+        </a>
+    </div>
+
+    
+
+    <!-- jQuery -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="js/jqBootstrapValidation.js"></script>
+    <script src="js/contact_me.js"></script>
+
+    <!-- Theme JavaScript -->
+    <script src="js/freelancer.min.js"></script>
+
+</body>
+
+</html>
