@@ -15,8 +15,8 @@
  - Conversion of CFG to CNFG is done manually. The program recognizes and accepts only CNFG and not CFG directly.
  - The program employs the lower-triangular form of the CKY parsing matrix. Both upper-triangular and lower-triangular matrix form yield the same answers. 
 
-### CFG
-`
+### CFG  
+`  
 S -> NP VP  
 S -> VP  
 NP -> Pronoun  
@@ -30,18 +30,20 @@ VP -> Verb NP PP
 VP -> Verb PP  
 VP -> VP PP  
 PP -> Preposition NP  
-`
+`  
 
 ##### Lexicon  
-`
+`  
 Det -> The | the | a | the | send | reached | seven | they  
 Noun -> parcel | weight | beautiful | document | feasible | discount | warehouse | for | away | location | belonged | little | beds  
 Verb -> was | gave | gives | told | thought | slowly | found  
 Pronoun -> There | it | he | the | expensive  
 Proper Noun -> Snow-White | goods | heavy | big |cheap | timely | children  
 Preposition -> in | named | and | to | into  
+`  
 
 ### CNFG
+`  
 S -> NP VP  
 S -> Verb NP  
 S -> X2 PP  
@@ -133,7 +135,7 @@ Preposition -> in
 Preposition -> into  
 Preposition -> to  
 Preposition -> send  
-`
+`  
 
 ### Future Scope
  - Write documentation to use the program including clear instructions for users on how to specify grammar in the program input box / textarea with proper syntax rules.  
