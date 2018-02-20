@@ -11,11 +11,12 @@
  - CNFG so obtained is fed into the CKY parsing algorithm
 
 ### Assumptions
- - I am using CFG of my own choice as described later. Any other CFG can also be used. 
+ - The CFG used in the project is described in the section below. Any other CFG can also be used. 
  - Conversion of CFG to CNFG is done manually. The program recognizes and accepts only CNFG and not CFG directly.
  - The program employs the lower-triangular form of the CKY parsing matrix. Both upper-triangular and lower-triangular matrix form yield the same answers. 
 
 ### CFG
+`
 S -> NP VP  
 S -> VP  
 NP -> Pronoun  
@@ -29,8 +30,10 @@ VP -> Verb NP PP
 VP -> Verb PP  
 VP -> VP PP  
 PP -> Preposition NP  
+`
 
 ##### Lexicon  
+`
 Det -> The | the | a | the | send | reached | seven | they  
 Noun -> parcel | weight | beautiful | document | feasible | discount | warehouse | for | away | location | belonged | little | beds  
 Verb -> was | gave | gives | told | thought | slowly | found  
@@ -130,9 +133,10 @@ Preposition -> in
 Preposition -> into  
 Preposition -> to  
 Preposition -> send  
+`
 
 ### Future Scope
- - Write clear instructions for users on how to specify grammar in the program input box / textarea.  
+ - Write documentation to use the program including clear instructions for users on how to specify grammar in the program input box / textarea with proper syntax rules.  
  - Add functionality in program to do automatic conversion of CFG to CNFG. The program should be able to recognize and accept both CNFG and CFG.
  - Ask user to specify which triangular form to use to generate the CKY parsing matrix. The program should be able to employ both the lower-triangular and upper-triangular form of the CKY parsing matrix.
 
@@ -151,5 +155,5 @@ Page title: Freelancer - Start Bootstrap Theme
 URL: https://blackrockdigital.github.io/startbootstrap-freelancer/  
 
 ### 3. Lion Head Logo
-Website title: Tamuc.edu  
+Page title: Tamuc.edu  
 URL: http://www.tamuc.edu/facultyStaffServices/marketingCommunications/standards/logos/documents/2013-Lion-Head.png  
