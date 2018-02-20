@@ -1,21 +1,19 @@
 # CKY Parser  
+ - Project Website: [https://abhijeetchopra.github.io/CKY-Parser/](https://abhijeetchopra.github.io/CKY-Parser/)
 
-### Project Website
- - [https://abhijeetchopra.github.io/CKY-Parser/](https://abhijeetchopra.github.io/CKY-Parser/)
-
-### Project Goal
+# Project Goal
  - Use the CKY parsing algorithm (alternatively called CYK parsing algorithm) to parse a particular input string and check whether it is derivable by the grammar or not. 
 
-### Project Description
+# Project Description
  - Context Free Grammar(CFG) is converted into Chomsky Normal Form Grammar(CNFG).  
  - CNFG so obtained is fed into the CKY parsing algorithm
 
-### Assumptions
+# Assumptions
  - The CFG used in the project is described in the section below. Any other CFG can also be used. 
  - Conversion of CFG to CNFG is done manually. The program recognizes and accepts only CNFG and not CFG directly.
  - The program employs the lower-triangular form of the CKY parsing matrix. Both upper-triangular and lower-triangular matrix form yield the same answers. 
 
-### CFG
+# CFG
 ` S -> NP VP  `  
 ` S -> VP  `  
 ` NP -> Pronoun  `  
@@ -30,7 +28,7 @@
 ` VP -> VP PP  `  
 ` PP -> Preposition NP  `  
 
-##### Lexicon    
+#### Lexicon    
 ` Det -> The | the | a | the | send | reached | seven | they  `  
 ` Noun -> parcel | weight | beautiful | document | feasible | discount | warehouse | for | away | location | belonged | little | beds  `  
 ` Verb -> was | gave | gives | told | thought | slowly | found  `  
@@ -38,7 +36,7 @@
 ` Proper Noun -> Snow-White | goods | heavy | big |cheap | timely | children  `  
 ` Preposition -> in | named | and | to | into  `  
 
-### CNFG  
+# CNFG  
 ` S -> NP VP  `  
 ` S -> Verb NP  `  
 ` S -> X2 PP  `  
@@ -131,7 +129,7 @@
 ` Preposition -> to  `  
 ` Preposition -> send  `  
 
-### Future Scope
+# Future Scope
  - Write documentation to use the program including clear instructions for users on how to specify grammar in the program input box / textarea with proper syntax rules.  
  - Add functionality in program to do automatic conversion of CFG to CNFG. The program should be able to recognize and accept both CNFG and CFG.
  - Ask user to specify which triangular form to use to generate the CKY parsing matrix. The program should be able to employ both the lower-triangular and upper-triangular form of the CKY parsing matrix.
