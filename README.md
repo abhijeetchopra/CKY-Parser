@@ -16,8 +16,8 @@
  - The program employs the lower-triangular form of the CKY parsing matrix. Both upper-triangular and lower-triangular matrix form yield the same answers. 
 
 ### CFG  
-`  
-S -> NP VP  
+  
+`S -> NP VP  
 S -> VP  
 NP -> Pronoun  
 NP -> Proper Noun  
@@ -32,9 +32,9 @@ VP -> VP PP
 PP -> Preposition NP  
 `  
 
-##### Lexicon  
-`  
-Det -> The | the | a | the | send | reached | seven | they  
+##### Lexicon    
+
+`Det -> The | the | a | the | send | reached | seven | they  
 Noun -> parcel | weight | beautiful | document | feasible | discount | warehouse | for | away | location | belonged | little | beds  
 Verb -> was | gave | gives | told | thought | slowly | found  
 Pronoun -> There | it | he | the | expensive  
@@ -43,8 +43,8 @@ Preposition -> in | named | and | to | into
 `  
 
 ### CNFG
-`  
-S -> NP VP  
+
+`S -> NP VP  
 S -> Verb NP  
 S -> X2 PP  
 S -> Verb PP  
