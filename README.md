@@ -16,120 +16,120 @@
  - The program employs the lower-triangular form of the CKY parsing matrix. Both upper-triangular and lower-triangular matrix form yield the same answers. 
 
 ### CFG
-` S -> NP VP  `
-` S -> VP  `
-` NP -> Pronoun  `
-` NP -> Proper Noun  `
-` Nominal -> Noun  `
-` Nominal -> Nominal Noun  `
-` Nominal -> Nominal PP  `
-` VP -> Verb  `
-` VP -> Verb NP  `
-` VP -> Verb NP PP  `
-` VP -> Verb PP  `
-` VP -> VP PP  `
-` PP -> Preposition NP  `
+` S -> NP VP  `  
+` S -> VP  `  
+` NP -> Pronoun  `  
+` NP -> Proper Noun  `  
+` Nominal -> Noun  `  
+` Nominal -> Nominal Noun  `  
+` Nominal -> Nominal PP  `  
+` VP -> Verb  `  
+` VP -> Verb NP  `  
+` VP -> Verb NP PP  `  
+` VP -> Verb PP  `  
+` VP -> VP PP  `  
+` PP -> Preposition NP  `  
 
 ##### Lexicon    
-` Det -> The | the | a | the | send | reached | seven | they  `
-` Noun -> parcel | weight | beautiful | document | feasible | discount | warehouse | for | away | location | belonged | little | beds  `
-` Verb -> was | gave | gives | told | thought | slowly | found  `
-` Pronoun -> There | it | he | the | expensive  `
-` Proper Noun -> Snow-White | goods | heavy | big |cheap | timely | children  `
-` Preposition -> in | named | and | to | into  `
+` Det -> The | the | a | the | send | reached | seven | they  `  
+` Noun -> parcel | weight | beautiful | document | feasible | discount | warehouse | for | away | location | belonged | little | beds  `  
+` Verb -> was | gave | gives | told | thought | slowly | found  `  
+` Pronoun -> There | it | he | the | expensive  `  
+` Proper Noun -> Snow-White | goods | heavy | big |cheap | timely | children  `  
+` Preposition -> in | named | and | to | into  `  
 
 ### CNFG  
-` S -> NP VP  `
-` S -> Verb NP  `
-` S -> X2 PP  `
-` S -> Verb PP  `
-` S -> VP PP  `
-` S -> was  `
-` S -> gave  `
-` S -> gives  `
-` S -> told  `
-` S -> slowly  `
-` S -> found  `
-` S -> thought  `
-` S -> ordered  `
-` NP -> There  `
-` NP -> It  `
-` NP -> big  `
-` NP -> cheap  `
-` NP -> goods  `
-` NP -> He  `
-` NP -> the  `
-` NP -> her  `
-` NP -> timely  `
-` NP -> expensive  `
-` NP -> children  `
-` NP -> FedEx  `
-` NP -> heavy  `
-` NP -> Det Nominal  `
-` Nominal -> Nominal Noun  `
-` Nominal -> Nominal PP  `
-` Nominal -> beautiful  `
-` Nominal -> feasible  `
-` Nominal -> parcel  `
-` Nominal -> weight  `
-` Nominal -> far  `
-` Nominal -> location  `
-` Nominal -> little  `
-` Nominal -> belonged  `
-` Nominal -> envelope  `
-` Nominal -> important  `
-` Nominal -> warehouse  `
-` VP -> was  `
-` VP -> gave  `
-` VP -> gives  `
-` VP -> told  `
-` VP -> slowly  `
-` VP -> found  `
-` VP -> thought  `
-` VP -> ordered  `
-` VP -> Verb NP  `
-` VP -> X2 PP  `
-` X2 -> Verb NP  `
-` VP -> Verb PP  `
-` VP -> VP PP  `
-` PP -> Preposition NP  `
-` Verb -> was  `
-` Verb -> gave  `
-` Verb -> gives  `
-` Verb -> told  `
-` Verb -> slowly  `
-` Verb -> found  `
-` Verb -> thought  `
-` Verb -> ordered  `
-` Det -> a  `
-` Det -> The  `
-` Det -> the  `
-` Det -> her  `
-` Det -> send  `
-` Det -> reached  `
-` Det -> seven  `
-` Det -> they  `
-` Noun -> document  `
-` Noun -> discount  `
-` Noun -> away  `
-` Noun -> beds  `
-` Noun -> beautiful  `
-` Noun -> feasible  `
-` Noun -> parcel  `
-` Noun -> weight  `
-` Noun -> far  `
-` Noun -> location  `
-` Noun -> little  `
-` Noun -> belonged  `
-` Noun -> envelope  `
-` Noun -> important  `
-` Noun -> warehouse  `
-` Preposition -> named  `
-` Preposition -> and  `
-` Preposition -> in  `
-` Preposition -> into  `
-` Preposition -> to  `
-` Preposition -> send  `
+` S -> NP VP  `  
+` S -> Verb NP  `  
+` S -> X2 PP  `  
+` S -> Verb PP  `  
+` S -> VP PP  `  
+` S -> was  `  
+` S -> gave  `  
+` S -> gives  `  
+` S -> told  `  
+` S -> slowly  `  
+` S -> found  `  
+` S -> thought  `  
+` S -> ordered  `  
+` NP -> There  `  
+` NP -> It  `  
+` NP -> big  `  
+` NP -> cheap  `  
+` NP -> goods  `  
+` NP -> He  `  
+` NP -> the  `  
+` NP -> her  `  
+` NP -> timely  `  
+` NP -> expensive  `  
+` NP -> children  `  
+` NP -> FedEx  `  
+` NP -> heavy  `  
+` NP -> Det Nominal  `  
+` Nominal -> Nominal Noun  `  
+` Nominal -> Nominal PP  `  
+` Nominal -> beautiful  `  
+` Nominal -> feasible  `  
+` Nominal -> parcel  `  
+` Nominal -> weight  `  
+` Nominal -> far  `  
+` Nominal -> location  `  
+` Nominal -> little  `  
+` Nominal -> belonged  `  
+` Nominal -> envelope  `  
+` Nominal -> important  `  
+` Nominal -> warehouse  `  
+` VP -> was  `  
+` VP -> gave  `  
+` VP -> gives  `  
+` VP -> told  `  
+` VP -> slowly  `  
+` VP -> found  `  
+` VP -> thought  `  
+` VP -> ordered  `  
+` VP -> Verb NP  `  
+` VP -> X2 PP  `  
+` X2 -> Verb NP  `  
+` VP -> Verb PP  `  
+` VP -> VP PP  `  
+` PP -> Preposition NP  `  
+` Verb -> was  `  
+` Verb -> gave  `  
+` Verb -> gives  `  
+` Verb -> told  `  
+` Verb -> slowly  `  
+` Verb -> found  `  
+` Verb -> thought  `  
+` Verb -> ordered  `  
+` Det -> a  `  
+` Det -> The  `  
+` Det -> the  `  
+` Det -> her  `  
+` Det -> send  `  
+` Det -> reached  `  
+` Det -> seven  `  
+` Det -> they  `  
+` Noun -> document  `  
+` Noun -> discount  `  
+` Noun -> away  `  
+` Noun -> beds  `  
+` Noun -> beautiful  `  
+` Noun -> feasible  `  
+` Noun -> parcel  `  
+` Noun -> weight  `  
+` Noun -> far  `  
+` Noun -> location  `  
+` Noun -> little  `  
+` Noun -> belonged  `  
+` Noun -> envelope  `  
+` Noun -> important  `  
+` Noun -> warehouse  `  
+` Preposition -> named  `  
+` Preposition -> and  `  
+` Preposition -> in  `  
+` Preposition -> into  `  
+` Preposition -> to  `  
+` Preposition -> send  `  
 
 ### Future Scope
  - Write documentation to use the program including clear instructions for users on how to specify grammar in the program input box / textarea with proper syntax rules.  
