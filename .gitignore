@@ -1,0 +1,5 @@
+# snyk vscode extention cache file
+.dccache
+
+# sonarqube project properties file
+sonar-project.properties
