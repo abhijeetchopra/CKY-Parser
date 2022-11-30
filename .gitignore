@@ -3,3 +3,6 @@
 
 # sonarqube project properties file
 sonar-project.properties
+
+# local .env file
+.env
