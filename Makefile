@@ -31,8 +31,8 @@ build:
 		VERSION=$${READ_VERSION:-$$FILE_VERSION}; \
 		docker build -t $(APP_NAME):$$VERSION .;
 
-.PHONY: scan
-scan:
+.PHONY: snyk-container-scan
+snyk-container-scan:
 		@# scan container with snyk for high severity CVEs
 		@FILE_VERSION=$$(cat VERSION); \
 		echo "Enter version to build...(leave blank to read from VERSION file which currently is: $$FILE_VERSION)"; \
@@ -41,6 +41,11 @@ scan:
 		echo $$FILE_VERSION; \
 		VERSION=$${READ_VERSION:-$$FILE_VERSION}; \
 		snyk container test --severity-threshold=high --exclude-base-image-vulns $(APP_NAME):$$VERSION;
+
+.PHONY: scan-code-scan
+snyk-code-scan:
+		@# scan static code with snyk for high severity CVEs
+		snyk code test;
 
 .PHONY: start
 start:
