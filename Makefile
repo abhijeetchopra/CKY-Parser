@@ -1,3 +1,5 @@
+include .env
+
 .PHONY: init
 
 APP_NAME=cky-parser
@@ -42,10 +44,25 @@ snyk-container-scan:
 		VERSION=$${READ_VERSION:-$$FILE_VERSION}; \
 		snyk container test --severity-threshold=high --exclude-base-image-vulns $(APP_NAME):$$VERSION;
 
-.PHONY: scan-code-scan
+.PHONY: snyk-code-scan
 snyk-code-scan:
 		@# scan static code with snyk for high severity CVEs
 		snyk code test;
+
+.PHONY: sonarqube
+sonarqube:
+		docker run -d --name sonarqube \
+			-e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
+			-p 9000:9000 sonarqube:latest
+
+.PHONY: sonar-scanner
+sonar-scanner:
+		docker run --platform linux/x86_64 --rm \
+			-e SONAR_HOST_URL="http://localhost:9000" \
+			-e SONAR_SCANNER_OPTS="-Dsonar.projectKey=$(APP_NAME)" \
+			-e SONAR_LOGIN="$(SONARQUBE_AUTH_TOKEN)" \
+			-v "$(PWD):/usr/src" \
+			sonarsource/sonar-scanner-cli:latest
 
 .PHONY: start
 start:
